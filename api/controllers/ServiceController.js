@@ -5,8 +5,25 @@
  * @help        :: See http://sailsjs.org/#!/documentation/concepts/Controllers
  */
 
+var util = require('util')
+var exec = require('child_process').exec;
+var fs = require('fs')
+
 module.exports = {
   normalize: function (req, res) {
+    var param = JSON.stringify(req.body)
+    if(_.isUndefined(fs.writeFileSync(param.filename, param.data)))
+      res.json({})
+
+    console.log()
+    var child = exec("blindmotion/data_prepaire/Normalizer ", function (error, stdout, stderr) {
+      util.print('stdout: ' + stdout);
+      util.print('stderr: ' + stderr);
+      if (error !== null) {
+        console.log('exec error: ' + error);
+      }
+      res.json({data: stdout})
+    });
 
   },
   modifier: function (req, res) {
@@ -34,7 +51,7 @@ module.exports = {
 
   },
   compaire_events: function (req, res) {
-    
+
   }
 };
 
