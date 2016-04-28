@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.2.2/jquery.min.js"></script>
+  <script>
+
+      var file1 = new File([""], "/Users/SeongHwanKim/blindmotion/sensors/2014-09-17_SensorDatafile.csv");
+      var file2 = new File([""], "/Users/SeongHwanKim/blindmotion/sensors/2014-09-18_SensorDatafile.csv");
+
+      var reader = new FileReader();
+      reader.onload = function(){
+        var text = reader.result;
+        var reader2 = new FileReader();
+        reader2.onload = function() {
+          var text2 = reader2.result;
+          $.ajax({method:'post', url:'/service/normalizer', data:{file1:text, file1name:file1.name, file2: text2, file2name:file2.name}}).done(function (data) {
+            console.log(data);
+          })
+        }
+        reader2.readAsText(file2)
+      };
+      reader.readAsText(file1);
+  </script>
+</head>
+<body>
+</body>
+</html>

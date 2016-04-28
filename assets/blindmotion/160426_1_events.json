@@ -1,0 +1,80 @@
+[
+    {
+        "start": "18:45:12", 
+        "direction": 0, 
+        "end": "18:45:15", 
+        "type": 5
+    }, 
+    {
+        "start": "18:45:29", 
+        "direction": 0, 
+        "end": "18:45:33", 
+        "type": 5
+    }, 
+    {
+        "start": "18:45:31", 
+        "direction": 0, 
+        "end": "18:45:34", 
+        "type": 5
+    }, 
+    {
+        "start": "18:45:56", 
+        "direction": 1, 
+        "end": "18:45:58", 
+        "type": 5
+    }, 
+    {
+        "start": "18:46:15", 
+        "direction": 0, 
+        "end": "18:46:17", 
+        "type": 5
+    }, 
+    {
+        "start": "18:46:18", 
+        "direction": 0, 
+        "end": "18:46:25", 
+        "type": 6
+    }, 
+    {
+        "start": "18:46:24", 
+        "direction": 0, 
+        "end": "18:46:26", 
+        "type": 5
+    }, 
+    {
+        "start": "18:46:35", 
+        "direction": 1, 
+        "end": "18:46:40", 
+        "type": 5
+    }, 
+    {
+        "start": "18:46:38", 
+        "direction": 1, 
+        "end": "18:46:40", 
+        "type": 5
+    }, 
+    {
+        "start": "18:46:40", 
+        "direction": 1, 
+        "end": "18:46:42", 
+        "type": 5
+    }, 
+    {
+        "start": "18:49:35", 
+        "direction": 0, 
+        "end": "18:49:38", 
+        "type": 1
+    }, 
+    {
+        "start": "18:52:12", 
+        "direction": 1, 
+        "end": "18:52:15", 
+        "type": 4
+    }, 
+    {
+        "start": "18:52:14", 
+        "direction": 1, 
+        "end": "18:52:16", 
+        "type": 5
+    }
+]

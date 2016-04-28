@@ -10,24 +10,51 @@ var exec = require('child_process').exec;
 var fs = require('fs')
 
 module.exports = {
-  normalize: function (req, res) {
-    var param = JSON.stringify(req.body)
-    if(_.isUndefined(fs.writeFileSync(param.filename, param.data)))
-      res.json({})
+  index: function (req,res){
 
-    console.log()
-    var child = exec("blindmotion/data_prepaire/Normalizer ", function (error, stdout, stderr) {
-      util.print('stdout: ' + stdout);
-      util.print('stderr: ' + stderr);
-      if (error !== null) {
-        console.log('exec error: ' + error);
-      }
-      res.json({data: stdout})
-    });
+    res.writeHead(200, {'content-type': 'text/html'});
+    res.end(
+      '<form action="/service/normalizer" enctype="multipart/form-data" method="post">'+
+      '<input type="text" name="title"><br>'+
+      '<input type="file" name="file1" multiple="multiple"><br>'+
+      '<input type="submit" value="Upload">'+
+      '</form>'
+    )
+  },
 
+
+  normalizer: function (req, res) {
+    FileService.upload(req, ['file1', 'file2'], function(err, files, isFile) {
+      console.log(files, isFile);
+      console.log("blindmotion/data_prepaire/Normalizer -output {0} {1}".format(files[0].fd+'.norm', files[0].fd))
+      if(err)
+        res.error(err)
+      var output_file = {fd: files[0].fd+'.norm', name: files[0].fd+'.'}
+      var child = exec("blindmotion/data_prepaire/Normalizer -output {0} {1}".format(files[0].fd+'.norm', files[0].fd), function (error, stdout, stderr) {
+        console.log('stdout: ' + stdout);
+        console.log('stderr: ' + stderr);
+        if (error !== null) {
+          res.error(error)
+        }
+        FileService.download(res, [{fd: files[0].fd+'.norm', name: files[0].name+'.norm'}], isFile);
+      });
+    })
   },
   modifier: function (req, res) {
-
+    FileService.upload(req, ['file1'], function(err, files, isFile) {
+      console.log(files, isFile);
+      console.log("coffee blindmotion/data_prepaire/modifier.coffee --input {0} --output {1} --modifier blindmotion/data_prepaire/smooth.coffee".format(files[0].fd, files[0].fd+'smooth'));
+      if(err)
+        res.error(err)
+      var child = exec("coffee blindmotion/data_prepaire/modifier.coffee --input {0} --output {1} --modifier blindmotion/data_prepaire/smooth.coffee".format(files[0].fd, files[0].fd+'smooth'), function (error, stdout, stderr) {
+        console.log('stdout: ' + stdout);
+        console.log('stderr: ' + stderr);
+        if (error !== null) {
+          res.error(error)
+        }
+        FileService.download(res, [{fd: files[0].fd+'.smooth', name: files[0].name+'.smooth'}], isFile);
+      });
+    });
   },
   prepaire: function (req, res) {
 

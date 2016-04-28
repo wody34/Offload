@@ -1,0 +1,260 @@
+[
+    {
+        "start": "16:29:38", 
+        "direction": 0, 
+        "end": "16:29:41", 
+        "type": 5
+    }, 
+    {
+        "start": "16:30:47", 
+        "direction": 1, 
+        "end": "16:30:51", 
+        "type": 4
+    }, 
+    {
+        "start": "16:30:54", 
+        "direction": 0, 
+        "end": "16:30:56", 
+        "type": 5
+    }, 
+    {
+        "start": "16:31:15", 
+        "direction": 1, 
+        "end": "16:31:18", 
+        "type": 4
+    }, 
+    {
+        "start": "16:31:31", 
+        "direction": 0, 
+        "end": "16:31:33", 
+        "type": 5
+    }, 
+    {
+        "start": "16:31:35", 
+        "direction": 0, 
+        "end": "16:31:37", 
+        "type": 1
+    }, 
+    {
+        "start": "16:32:05", 
+        "direction": 0, 
+        "end": "16:32:09", 
+        "type": 5
+    }, 
+    {
+        "start": "16:32:16", 
+        "direction": 0, 
+        "end": "16:32:18", 
+        "type": 5
+    }, 
+    {
+        "start": "16:32:26", 
+        "direction": 1, 
+        "end": "16:32:28", 
+        "type": 5
+    }, 
+    {
+        "start": "16:32:31", 
+        "direction": 0, 
+        "end": "16:32:33", 
+        "type": 5
+    }, 
+    {
+        "start": "16:33:25", 
+        "direction": 0, 
+        "end": "16:33:27", 
+        "type": 5
+    }, 
+    {
+        "start": "16:33:37", 
+        "direction": 0, 
+        "end": "16:33:39", 
+        "type": 5
+    }, 
+    {
+        "start": "16:34:12", 
+        "direction": 0, 
+        "end": "16:34:15", 
+        "type": 5
+    }, 
+    {
+        "start": "16:34:22", 
+        "direction": 1, 
+        "end": "16:34:24", 
+        "type": 4
+    }, 
+    {
+        "start": "16:34:29", 
+        "direction": 0, 
+        "end": "16:34:31", 
+        "type": 5
+    }, 
+    {
+        "start": "16:34:50", 
+        "direction": 1, 
+        "end": "16:34:52", 
+        "type": 4
+    }, 
+    {
+        "start": "16:35:06", 
+        "direction": 0, 
+        "end": "16:35:10", 
+        "type": 5
+    }, 
+    {
+        "start": "16:35:45", 
+        "direction": 0, 
+        "end": "16:35:48", 
+        "type": 5
+    }, 
+    {
+        "start": "16:35:55", 
+        "direction": 1, 
+        "end": "16:35:58", 
+        "type": 4
+    }, 
+    {
+        "start": "16:36:02", 
+        "direction": 0, 
+        "end": "16:36:04", 
+        "type": 5
+    }, 
+    {
+        "start": "16:36:44", 
+        "direction": 1, 
+        "end": "16:36:47", 
+        "type": 4
+    }, 
+    {
+        "start": "16:36:56", 
+        "direction": 0, 
+        "end": "16:36:59", 
+        "type": 5
+    }, 
+    {
+        "start": "16:37:08", 
+        "direction": 0, 
+        "end": "16:37:13", 
+        "type": 5
+    }, 
+    {
+        "start": "16:37:12", 
+        "direction": 0, 
+        "end": "16:37:14", 
+        "type": 5
+    }, 
+    {
+        "start": "16:37:54", 
+        "direction": 0, 
+        "end": "16:37:57", 
+        "type": 5
+    }, 
+    {
+        "start": "16:38:04", 
+        "direction": 1, 
+        "end": "16:38:07", 
+        "type": 4
+    }, 
+    {
+        "start": "16:38:10", 
+        "direction": 0, 
+        "end": "16:38:12", 
+        "type": 5
+    }, 
+    {
+        "start": "16:39:00", 
+        "direction": 0, 
+        "end": "16:39:05", 
+        "type": 5
+    }, 
+    {
+        "start": "16:39:36", 
+        "direction": 0, 
+        "end": "16:39:39", 
+        "type": 5
+    }, 
+    {
+        "start": "16:39:47", 
+        "direction": 1, 
+        "end": "16:39:49", 
+        "type": 4
+    }, 
+    {
+        "start": "16:39:53", 
+        "direction": 0, 
+        "end": "16:39:55", 
+        "type": 5
+    }, 
+    {
+        "start": "16:40:28", 
+        "direction": 1, 
+        "end": "16:40:32", 
+        "type": 4
+    }, 
+    {
+        "start": "16:41:26", 
+        "direction": 0, 
+        "end": "16:41:32", 
+        "type": 5
+    }, 
+    {
+        "start": "16:41:46", 
+        "direction": 1, 
+        "end": "16:41:49", 
+        "type": 4
+    }, 
+    {
+        "start": "16:41:52", 
+        "direction": 0, 
+        "end": "16:41:55", 
+        "type": 5
+    }, 
+    {
+        "start": "16:41:54", 
+        "direction": 0, 
+        "end": "16:41:56", 
+        "type": 1
+    }, 
+    {
+        "start": "16:42:15", 
+        "direction": 0, 
+        "end": "16:42:17", 
+        "type": 5
+    }, 
+    {
+        "start": "16:42:28", 
+        "direction": 1, 
+        "end": "16:42:31", 
+        "type": 4
+    }, 
+    {
+        "start": "16:42:39", 
+        "direction": 1, 
+        "end": "16:42:41", 
+        "type": 5
+    }, 
+    {
+        "start": "16:42:58", 
+        "direction": 0, 
+        "end": "16:43:00", 
+        "type": 5
+    }, 
+    {
+        "start": "16:43:20", 
+        "direction": 1, 
+        "end": "16:43:22", 
+        "type": 5
+    }, 
+    {
+        "start": "16:43:34", 
+        "direction": 0, 
+        "end": "16:43:39", 
+        "type": 5
+    }, 
+    {
+        "start": "16:43:43", 
+        "direction": 1, 
+        "end": "16:43:45", 
+        "type": 5
+    }
+]

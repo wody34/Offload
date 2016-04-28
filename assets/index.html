@@ -1,0 +1,40 @@
+<html ng-controller="BlindMotionController">
+<head>
+    <title>C2V Middleware Demo</title>
+    <meta name="viewport" content="initial-scale=1.0, user-scalable=no">
+    <meta charset="utf-8">
+    <link href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-1q8mTJOASx8j1Au+a5WDVnPi2lkFfwwEAa8hDDdjZlpLegxhjVME1fgjWPGmkzs7" crossorigin="anonymous">
+    <style>
+        html, body {
+          height: 100%;
+          margin: 0;
+          padding: 0;
+        }
+        #map {
+          height: 60%;
+          width: 100%;
+        }
+
+    </style>
+</head>
+<body>
+<div class="row">
+  <div id="map"></div>
+  <div class="col-xs-4 btn-group">
+    <label class="btn btn-primary" ng-model="radioModel" uib-btn-radio="'Left'">Left</label>
+    <label class="btn btn-primary" ng-model="radioModel" uib-btn-radio="'Middle'">Middle</label>
+    <label class="btn btn-primary" ng-model="radioModel" uib-btn-radio="'Right'">Right</label>
+  </div>
+  <div class="col-xs-4 btn-group">
+    <video id="drive_video" width="640" height="480" autoplay></video>
+  </div>
+  <div class="col-xs-4 btn-group">
+
+  </div>
+
+</div>
+
+<script data-main="js/bootstrap" src="lib/require.js"></script>
+
+</body>
+</html>
