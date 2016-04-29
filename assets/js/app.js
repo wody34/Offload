@@ -12,34 +12,27 @@ define([
     var $app = angular.module('blindMotion', ['ui.bootstrap']);
 
     //공통 컨트롤러 설정 - 모든 컨트롤러에서 공통적으로 사용하는 부분들 선언
-    $app.controller('BlindMotionController', function($scope) {
-      var marker;
-      var map;
-
-      var speed = 1;
+    $app.controller('BlindMotionController', ['$scope', '$http', function($scope, $http) {
 
       (function initMap() {
+        var speed = 1;
         var vid = document.getElementById("drive_video");
         // vid.playbackRate = speed;
-        vid.src = "/video/2016-04-26_drive.mp4"
-        $.get('/blindmotion/2016-04-26_SensorDatafile_smooth.csv').done(function (data) {
-          $.get('/blindmotion/2016-04-26_events.json').done(function (eventData) {
+        vid.src = "/video/2016-04-26_drive.mp4";
+
+        $http.get('/blindmotion/2016-04-26_SensorDatafile_smooth.csv').success(function (data, status, headers, config) {
+          $http.get('/blindmotion/2016-04-26_events.json').success(function (eventData, status, headers, config) {
             var json = CSV2JSON(data);
-            sensorProcess(json);
-
-            map = new google.maps.Map(document.getElementById('map'), {
-              zoom: 17,
-              center: trajectory[1]
-            });
-
+            var sensor = sensorProcess(json);
             eventProcess(eventData);
 
-            var currtime = 0;
-//            var timeLine = time[1];
-//            var timeLineEnd = time[time.length];
+            var map = new google.maps.Map(document.getElementById('map'), {
+              zoom: 17,
+              center: sensor[0].trajectory
+            });
 
-            marker = new google.maps.Marker({
-              position: trajectory[1],
+            var marker = new google.maps.Marker({
+              position: sensor[0].trajectory,
               map: map,
               icon: new google.maps.MarkerImage('/images/car.png',
                 new google.maps.Size(48, 48),
@@ -47,39 +40,35 @@ define([
                 new google.maps.Point(24, 24))
             });
 
-            var count = 0;
-            for (var i = 0; i < time.length; i++) {
-              while (true) {
-                if (time[i].second >= (currtime + time[0].second)) {
-                  currtime += 1;
-                }
-                else
-                  break;
-              }
+            var curtime = -1;
+            var event_count = 0;
+            for (var i = 0; i < sensor.length; i++) {
+              while (sensor[i].time.second >= (++curtime + sensor[0].time.second));
 
-              moveMarkerWithTimeout(trajectory[i], currtime * 1000 / speed);
+              moveMarkerWithTimeout(map, marker, sensor[i].trajectory, curtime * 1000 / speed);
               // console.log(eventTime[count].original, time[0].original, currtime)
 
-              if ((eventTime[count].second - time[0].second) <= currtime) {
+              if ((eventData[event_count].time.second - sensor[0].time.second) <= curtime) {
                 // console.log('entitle event')
-                addEventWithTimeout(trajectory[i], eventType[count], currtime * 1000 / speed);
-
-                count++;
+                addEventWithTimeout(map, sensor[i].trajectory, eventData[event_count].type, curtime * 1000 / speed);
+                event_count++;
               }
             }
-          });
+          })
         });
+
+
       })();
 
 
-      function moveMarkerWithTimeout(position, timeout) {
+      function moveMarkerWithTimeout(map, marker, position, timeout) {
         window.setTimeout(function() {
           marker.setPosition(new google.maps.LatLng(position.lat, position.lng));
           map.panTo(new google.maps.LatLng(position.lat, position.lng));
         }, timeout);
       }
 
-      function addEventWithTimeout(position, eventType, timeout) {
+      function addEventWithTimeout(map, position, eventType, timeout) {
         window.setTimeout(function() {
           new google.maps.InfoWindow({
             content: 'Event: ' + eventType
@@ -89,7 +78,6 @@ define([
           }));
         }, timeout);
       }
-
 
       function CSVToArray(strData, strDelimiter) {
         // Check to see if the delimiter is defined. If not,
@@ -159,38 +147,24 @@ define([
         return json.replace(/},/g, "},\r\n");
       }
 
-      var trajectory = [];
-      var time = [];
-
       function sensorProcess(json) {
-        var sensor = JSON.parse(json);
-        var lan, lng;
-        for (var index in sensor) {
-
-          if (sensor[index].geo !== 'geo' || sensor[index].provider !== 'gps') {
+        var sensorData = JSON.parse(json);
+        var sensors = [];
+        for (var index in sensorData) {
+          var sensor = sensorData[index];
+          if (sensor.geo !== 'geo' || sensor.provider !== 'gps') {
             continue;
           }
-
-          lan = sensor[index].lat;
-          lng = sensor[index].lon;
-
-          var tmp = {};
-
-          tmp.lat = parseFloat(lan);
-          tmp.lng = parseFloat(lng);
-
-          trajectory.push(tmp);
-
-          time.push(toSecond(sensor[index].time));
+          sensors.push({trajectory: {lat:parseFloat(sensor.lat), lng:parseFloat(sensor.lon)}, time: toSecond(sensor.time)});
         }
+        return sensors;
       }
-
-      var eventTime = [];
-      var eventType = [];
 
       function eventProcess(eventData) {
         for (var index in eventData) {
-          eventTime.push(toSecond(eventData[index].start));
+          var event = eventData[index];
+          event.time = toSecond(event.start)
+
           var indicator = ""
           switch (eventData[index].type) {
             case 1:
@@ -215,16 +189,15 @@ define([
               indicator = "U"
               break;
           }
-
-          eventType.push(indicator);
+          event.type = indicator;
         }
       }
 
       function toSecond(stringTime) {
         var hms = stringTime.split(":")
-        return {original: stringTime, second: ((parseInt(hms[0])*60) + parseInt(hms[1])) * 60 + parseInt(hms[2])};
+        return {original: stringTime, second: ((parseInt(hms[0]) * 60) + parseInt(hms[1])) * 60 + parseInt(hms[2])};
       }
-    });
+    }]);
 
     return $app;
   }
