@@ -97,6 +97,7 @@ module.exports = {
     async.waterfall([
       function initSim(cb) {
         SimConfig = deepClone(_SimConfigTemplate);
+        SimResult = deepClone(_SimResultTemplate);
         SimState = "Initial";
         cb();
       },
@@ -129,15 +130,14 @@ module.exports = {
         })
       },
       function simulation(cb) {
-        var SIMTIME = SimConfig.model.simulationSpec.simulationTime;
-        sim.simulate(10000);
+        sim.simulate(SimConfig.model.simulationSpec.simulationTime);
         cb();
       }
     ], function (err, result) {
       if(err)
         console.log(err);
       console.log("C2V Connected Vehicle Simulator Successfully ended..");
-      SimResult.totalCloudCost =
+      SimResult.cloudUtilization = SimResult.totalCloudExecutionTimeResult/(SimConfig.model.simulationSpec.simulationTime * vms.length);
       result = SimResult;
       callback(result);
     });
@@ -175,13 +175,14 @@ function vehicleGenerator(intraVehicleModel) {
         },
         generateTask: function() {
           var nextArrivalAt = random.exponential(1.0 / LAMBDA);
+          var time = this.time();
           console.log("New task gen at", this.id, this.MIPS, this.time(), nextArrivalAt);
           sim.log("New Task gen");
           var task = [];
           SimResult.totalState = "execution";
 
           var test_vm = selectBestVM();
-          var offloading = OffloadingMethod.ModifiedMAUI1(test_vm);
+          var offloading = OffloadingMethod.allOffloading(test_vm);
           var appID = _.uniqueId()
           for (var i = 0; i < SimConfig.app.length; ++i) {
             task.push(_.extend(deepClone(SimConfig.app[i]), {
@@ -194,6 +195,7 @@ function vehicleGenerator(intraVehicleModel) {
           }
           task.id = appID;
           task.cur = 0;
+          task[task.cur].txTime = time;
           this.tasks.push(task);
           // console.log(task);
           this.setTimer(0).done(this.taskStart, this, [task]);
@@ -225,6 +227,7 @@ function vehicleGenerator(intraVehicleModel) {
             console.log(_.template('[Task<%= id %>] Start process at vehicle[<%= vehicle %>]')({id: task[task.cur].id, vehicle: this.id}));
             task[task.cur].procStartTime = time;
             task[task.cur].execLoc = 0;
+
             var executionTime = ExecutionTimeMethod.intraVehicle[this.model]({MI: task[task.cur].MI, MIPS: this.MIPS});
             this.setTimer(executionTime).done(this.taskEnd, this, [task]);
           }
@@ -240,6 +243,7 @@ function vehicleGenerator(intraVehicleModel) {
             task.dataTransferResult = 0;
             task.executionTimeResult = 0;
             task.totalCloudExecutionTimeResult = 0;
+            task.totalCloudCost = 0;
             for(var i = 0; i < task.cur; ++i) {
               task[i].dataTransferResult = task[i].rxTime - task[i].txTime;
               task[i].executionTimeResult = task[i].procEndTime - task[i].procStartTime;
@@ -247,9 +251,11 @@ function vehicleGenerator(intraVehicleModel) {
               task.executionTimeResult += task[i].executionTimeResult;
               if(task[i].execLoc === 1) {
                 task.totalCloudExecutionTimeResult += task[i].executionTimeResult;
+                task.totalCloudCost += task[i].executionTimeResult / 3600 * parseFloat(task[i].compPricing);
               }
-
             }
+            SimResult.totalCloudExecutionTimeResult += task.totalCloudExecutionTimeResult;
+            SimResult.totalCloudCost += task.totalCloudCost;
             SimResult.totalExecutionTimeResult += task.executionTimeResult + task.dataTransferResult;
             console.log(task);
           }
@@ -307,6 +313,7 @@ function vmGenerator(cloudModel) {
             var time = this.time();
             task[task.cur].rxTime = task[task.cur].procStartTime = time;
             task[task.cur].execLoc = 1;
+            task[task.cur].compPricing = this.compPricing;
             var executionTime = ExecutionTimeMethod.cloud[this.model]({MI: task[task.cur].MI, MIPS: this.MIPS});
             this.setTimer(executionTime).done(this.taskEnd, this, [sender, task]);
           },
