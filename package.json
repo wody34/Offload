@@ -26,6 +26,9 @@
     "request": "^2.72.0",
     "sails": "~0.12.3",
     "sails-disk": "~0.10.9",
+    "sails-mongo": "^0.12.0",
+    "simjs": "^1.0.1",
+    "simjs-random": "^0.2.6",
     "skipper": "^0.5.9"
   },
   "scripts": {

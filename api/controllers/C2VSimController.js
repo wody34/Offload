@@ -7,8 +7,8 @@
 
 module.exports = {
   C2VSim_Start: function(req, res) {
-    console.log(req.param('modelName'), req.param('appName'));
-    C2VSim_Broker.start(req.param('modelName'), req.param('appName'), function(result) {
+    console.log(req.param('model'), req.param('app'));
+    C2VSim_Broker.start(req.param('model'), req.param('app'), function(result) {
       res.json(result);
     });
   },
@@ -22,6 +22,12 @@ module.exports = {
   },
   C2VSim_State: function(req, res) {
     res.json(C2VSim_Broker.getState());
+  },
+  C2VSim_Start_Multi: function(req, res) {
+    console.log(req.param('model'), req.param('app'));
+    C2VSim_Broker_Multi.start(req.param('model'), req.param('app'), function(result) {
+      res.json(result);
+    });
   }
 };
 

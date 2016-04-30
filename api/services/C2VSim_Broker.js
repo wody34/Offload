@@ -85,49 +85,39 @@ var ExecutionTimeMethod = {
 }
 
 module.exports = {
-  start: function(modelName, appName, callback) {
+  start: function(modelID, appID, callback) {
     async.waterfall([
       function initSim(cb) {
         SimConfig = deepClone(_SimConfigTemplate);
-        SimConfig.networkThroughput = [];
         SimState = "Initial";
         cb();
       },
       function modelAccess(cb) {
-        C2VModel.find({name:modelName}).exec(function (err, models) {
+        C2VModel.find(modelID).exec(function (err, models) {
           SimConfig.model = models[0]
           cb(err);
         })
       },
       function appAccess(cb) {
-        C2VApp.find({name:appName}).exec(function (err, apps) {
+        C2VApp.find(appID).exec(function (err, apps) {
           SimConfig.app = apps[0].app;
           SimConfig.app.push({
             name: 'End',
             MI: 0,
-            inputSize: SimConfig.app[SimConfig.app.length-1].outputSize
+            inputSize: SimConfig.app[SimConfig.app.length-1].outputSize,
+            prevVertex: SimConfig.app[SimConfig.app.length-1].postVertex,
+            postVertex: "null"
           });
           cb(err);
         })
       },
       function dbAccess(cb) {
         SimResult.totalState = "profiling"
-        SimConfig.networkThroughput = [];
         SimState = "DB Access"
-        var con = mysql.createConnection({
-          host: "143.248.53.174",
-          port: "33060",
-          user: "kaist",
-          password: "kaist",
-          database: "broker_db"
-        });
-        con.query('select * from vecdata where vectorid="15690"', function(err,rows){
-          for(var i in rows) {
-            var row = rows[i];
-            if (i > 18) {
-              SimConfig.networkThroughput.push(parseFloat(row.value) / 8 / 1024);
-            }
-          }
+
+        NetworkThroughput.find({runid: 181}, function(err, rows) {
+          SimConfig.networkThroughput = rows[0].throughput[0].splice(19, rows[0].throughput[0].length);
+          console.log(SimConfig.networkThroughput);
           cb(err);
         });
       },
@@ -196,6 +186,7 @@ function simulation(offloading, callback) {
           function dataTransfer(cb) {
             //Input Data Transfer
             curVertex.dataTransferResult = (prevVertex.offloading !== curVertex.offloading) ? DataTransferTimeMethod.simple(parseFloat(curVertex.inputSize), SimConfig.networkThroughput[Math.round(SimResult.progressingExecutionTime)]) : 0;
+
             SimResult.totalCloudExecutionTimeResult += curVertex.dataTransferResult;
             SimResult.progressingExecutionTime += curVertex.dataTransferResult;
             cb(null, sleepSec);
