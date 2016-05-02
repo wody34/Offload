@@ -1,0 +1,125 @@
+<html>
+<head>
+  <title>C2V Middleware Demo</title>
+  <meta name="viewport" content="initial-scale=1.0, user-scalable=no">
+  <meta charset="utf-8">
+  <link href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-1q8mTJOASx8j1Au+a5WDVnPi2lkFfwwEAa8hDDdjZlpLegxhjVME1fgjWPGmkzs7" crossorigin="anonymous">
+</head>
+<body>
+<div class="box box-primary" ng-controller="C2VSim">
+  <div class="box-header">
+    <h3 class="box-title">C2V Connected Car Integrated Simulator</h3>
+  </div>
+  <!-- /.box-header -->
+  <div class="box-body" >
+    <div class="col-md-12">
+      <form role="form" ng-submit="startSimulation()">
+        <!-- general form elements disabled -->
+        <div class="box box-danger">
+          <div class="box-header">
+            <h3 class="box-title"><i class="fa fa-file-text fa-stack-1x fa-inverse"></i></span> C2V Simulation Model</h3>
+          </div><!-- /.box-header -->
+          <div class="box-body">
+            <!-- text input -->
+            <div class="form-group">
+              <label>Name</label>
+              <input type="text" class="form-control" ng-model="model.name" placeholder="Type Name"/>
+            </div>
+            <div class="form-group">
+              <label>Simulation Time</label>
+              <input type="text" class="form-control" ng-model="model.simulationSpec.simulationTime" placeholder="Second"/>
+            </div>
+            <div class="form-group">
+              <label>Inter-Vehicle Model</label>
+              <select class="form-control" ng-model="model.interVehicleModel.model" ng-options="option.value as option.value for option in options.interVehicleModel"></select>
+              <label>Vehicle Number</label>
+              <input type="text" class="form-control" ng-model="model.interVehicleModel.vehicleNumber" placeholder="Number"/>
+            </div>
+            <div class="form-group">
+              <label>Intra-Vehicle Model</label>
+              <select class="form-control" ng-model="model.intraVehicleModel.model" ng-options="option.value as option.value for option in options.intraVehicleModel"></select>
+              <label>Vehicle Number</label>
+              <input type="text" class="form-control" ng-model="model.interVehicleModel.vehicleNumber" placeholder="Number"/>
+              <label>Min MIPS</label>
+              <input type="text" class="form-control" ng-model="model.intraVehicleModel.minMIPS" placeholder="Number"/>
+              <label>Max MIPS</label>
+              <input type="text" class="form-control" ng-model="model.intraVehicleModel.maxMIPS" placeholder="Number"/>
+            </div>
+            <div class="form-group">
+              <label>Computational Offloading Model</label>
+              <select class="form-control" ng-model="model.compOffloading.model" ng-options="option.value as option.value for option in options.compOffloadingModel"></select>
+            </div>
+            <!-- radio -->
+          </div>
+          <div  class="box box-success">
+            <div class="box-body">
+              <button class="btn btn-success btn-block">Registration</button>
+            </div>
+          </div>
+        </div>
+      </form>
+
+    <div class="panel panel-default">
+      <div class="panel-body">
+        {{results}}
+      </div>
+    </div>
+    <div class="container-content" ng-cloak="true">
+      <div class="container-fluid">
+        <div class="row">
+          <div class="col-sm-12">
+            <div class="panel-group" bs-collapse>
+              <div class="panel panel-default">
+                <div class="panel-heading">
+                  <h4 class="panel-title">Timeline</h4>
+                  <button class="btn btn-default" ng-click="testFunction()">Test</button>
+                </div>
+                <div class="panel-collapse" bs-collapse-target>
+                  <div class="panel-body">
+                    <div gantt data="data"
+                         show-side="true"
+                         view-scale="'second'"
+                         auto-expand="'none'"
+                         headers="['day', 'minute', 'second']"
+                         max-height="options.maxHeight"
+                         headers-formats="headersFormats"
+                         api="registerApi"
+                         from-date="options.fromDate"
+                         to-date="options.toDate">
+                      <gantt-table enabled="true"
+                                   columns="['model.name']"
+                                   headers="{'model.name' : 'Name'}"
+                                   header-contents="{'model.name': '{{getHeader()}}'}">
+                      </gantt-table>
+                      <gantt-resize-sensor></gantt-resize-sensor>
+                      <gantt-tooltips></gantt-tooltips>
+                      <gantt-bounds></gantt-bounds>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<script data-main="js/bootstrap" src="lib/require.js"></script>
+<link href ="/lib/angular-gantt/angular-gantt.css" rel="stylesheet">
+<link href ="/lib/angular-gantt/angular-gantt-table-plugin.css" rel="stylesheet">
+<link href ="/lib/angular-gantt/angular-gantt-tree-plugin.css" rel="stylesheet">
+<link href ="/lib/angular-gantt/angular-gantt-bounds-plugin.css" rel="stylesheet">
+<link href ="/lib/angular-gantt/angular-gantt-dependencies-plugin.css" rel="stylesheet">
+<link href ="/lib/angular-gantt/angular-gantt-groups-plugin.css" rel="stylesheet">
+<link href ="/lib/angular-gantt/angular-gantt-labels-plugin.css" rel="stylesheet">
+<link href ="/lib/angular-gantt/angular-gantt-movable-plugin.css" rel="stylesheet">
+<link href ="/lib/angular-gantt/angular-gantt-overlap-plugin.css" rel="stylesheet">
+<link href ="/lib/angular-gantt/angular-gantt-plugins.css" rel="stylesheet">
+<link href ="/lib/angular-gantt/angular-gantt-progress-plugin.css" rel="stylesheet">
+<link href ="/lib/angular-gantt/angular-gantt-sortable-plugin.css" rel="stylesheet">
+<link href ="/lib/angular-gantt/angular-gantt-tooltips-plugin.css" rel="stylesheet">
+</body>
+</html>

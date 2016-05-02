@@ -197,6 +197,7 @@ function vehicleGenerator(intraVehicleModel) {
           task.cur = 0;
           task[task.cur].txTime = time;
           this.tasks.push(task);
+          SimResult.task.push(task);
           // console.log(task);
           this.setTimer(0).done(this.taskStart, this, [task]);
 
@@ -358,7 +359,14 @@ function getNT(time) {
 }
 
 function selectBestVM() {
-  if(vms[0].availability)
-    console.log('available!!');
-  return (vms[0].availability)?vms[0]:null;
+  var select = null;
+  var max = Number.MIN_VALUE
+  for(var i in vms) {
+    var vm = vms[i];
+    if(vm.availability && vm.MIPS > max) {
+      select = vm;
+      max = vm.MIPS;
+    }
+  }
+  return select;
 }

@@ -4,14 +4,170 @@
 define([
     'angular', //앵귤러 모듈을 사용하기 위해 임포트
     'uiBootstrap',
+    'angular-gantt',
+    'angular-gantt-table',
+    'angular-gantt-labels',
+    'angular-gantt-labels',
+    'angular-gantt-bounds',
+    'angular-gantt-dependencies',
+    'angular-gantt-drawtask',
+    'angular-gantt-groups',
+    'angular-gantt-movable',
+    'angular-gantt-overlap',
+    'angular-gantt-plugins',
+    'angular-gantt-progress',
+    'angular-gantt-sortable',
+    'angular-gantt-tooltips',
+    'angular-gantt-tree'
   ],
 
   //디펜던시 로드뒤 콜백함수
   function (angular) {
     //모듈 선언
-    var $app = angular.module('blindMotion', ['ui.bootstrap']);
+    var $app = angular.module('blindMotion', ['ui.bootstrap', 'gantt',
+      'gantt.sortable',
+      'gantt.movable',
+      'gantt.drawtask',
+      'gantt.tooltips',
+      'gantt.bounds',
+      'gantt.progress',
+      'gantt.table',
+      'gantt.groups',
+      'gantt.dependencies',
+      'gantt.overlap']);
 
-    //공통 컨트롤러 설정 - 모든 컨트롤러에서 공통적으로 사용하는 부분들 선언
+    $app.controller('C2VSim', ['$scope', '$http', function($scope, $http){
+      $scope.data = [];
+      $scope.options = {
+        maxHeight: 400,
+        fromDate: new Date(),
+        toDate: new Date()
+      };
+
+      $scope.headersFormats = {
+        day: 'MMMM D',
+        minute:'HH:mm',
+        second:'ss'
+      };
+
+      $http.get('/C2VModel/57248f265b194a081cd13777').success(function (data, status, headers, config) {
+        console.log(data);
+        $scope.model = data;
+      });
+
+      $scope.options = {
+        interVehicleModel: [{
+          value: 'SUMO'
+        }, {
+          value: 'other'
+        }],
+        intraVehicleModel: [{
+          value: 'iCanCloud'
+        }],
+        compOffloadingModel: [{
+          value: 'ModifiedMAUI1'
+        }]
+      };
+
+      $scope.startSimulation = function() {
+        $http.get('/C2VSim/C2VSim_Start_Multi?model=57248f265b194a081cd13777&app=5722fb189bd57fcd022cc5fc').success(function(data, status, headers, config) {
+          $scope.results = data;
+        });
+      }
+
+      $scope.testFunction = function(){
+        var length = $scope.data.length;
+        if(length == 0 || Math.random() > 0.5){
+          $scope.addRow('row'+length);
+          /*$scope.addRow('row'+(length+1));
+           $scope.addRow('row'+(length+2));
+           $scope.addRow('row'+(length+3));
+           $scope.addRow('row'+(length+4));
+           $scope.addRow('row'+(length+5));
+           $scope.addRow('row'+(length+6));
+           $scope.addRow('row'+(length+7));
+           $scope.addRow('row'+(length+8));
+           $scope.addRow('row'+(length+9));
+           $scope.addRow('row'+(length+10));*/
+        }
+
+        var targetRow = 'row' + Math.floor(Math.random() * length);
+        for(var key in $scope.data){
+          if($scope.data[key].name == targetRow){
+            var rand_r = (Math.floor(Math.random() * 255));
+            var rand_g = (Math.floor(Math.random() * 255));
+            var rand_b = (Math.floor(Math.random() * 255));
+            var rand_color = '#' + rand_r.toString(16) + rand_g.toString(16) + rand_b.toString(16);
+
+            var tmp_tsk = {
+              'name': 'randTask',
+              'from': new Date(),
+              'to': new Date(),
+              'color': rand_color
+            };
+
+            if(tmp_tsk.to.getSeconds() <= 59)
+              tmp_tsk.to.setSeconds(tmp_tsk.to.getSeconds() + 1);
+            else
+              tmp_tsk.from.setSeconds(0);
+
+            var tmp_obj = {};
+            tmp_obj[targetRow] = [tmp_tsk];
+
+            $scope.addTasksToRow(tmp_obj);
+
+            break;
+          }
+        }
+      };
+
+      $scope.addRow = function(_name){
+        var tmp = {};
+        tmp.name = _name;
+        tmp.tasks = [];
+        return $scope.data.push(tmp);
+      };
+
+      $scope.addTasksToRow = function(_tasks){
+        for(var key in _tasks){
+          var exist = false;
+          for(var index in $scope.data){
+            if($scope.data[index].name == key){
+              exist = true;
+              var target_row = $scope.data[index];
+              while(_tasks[key].length != 0){
+                target_row.tasks.push(_tasks[key].pop());
+              }
+              console.log(target_row.tasks);
+              /*$scope.data[index].tasks = $scope.data[index].tasks.concat(_tasks[key]);*/
+              break;
+            }
+          }
+          if(!exist) {
+            var target_row = $scope.addRow(key);
+            while(_tasks[key].length != 0){
+              target_row.tasks.push(_tasks[key].pop());
+            }
+          }
+        }
+        $scope.options.toDate = new Date();
+      };
+
+      $scope.registerApi = function(api){
+        $scope.api = api;
+        console.log(api);
+        api.data.on.change($scope, function(){
+          console.log('data.on.change');
+        });
+
+        api.tasks.on.add($scope, function(){
+          api.columns.refresh();
+          api.rows.refresh();
+          console.log('tasks.on.add');
+        });
+      };
+    }]);
+
     $app.controller('BlindMotionController', ['$scope', '$http', function($scope, $http) {
 
       (function initMap() {
@@ -56,8 +212,6 @@ define([
             }
           })
         });
-
-
       })();
 
 
