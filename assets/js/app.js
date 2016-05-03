@@ -54,7 +54,14 @@ define([
         second:'ss'
       };
 
-      $http.get('/C2VModel/5727027bd8e215873370b3da').success(function (data, status, headers, config) {
+      $http.get('/C2VApp').success(function (data, status, headers, config) {
+        $scope.options.app = []
+        for(var i in data)
+          $scope.options.app.push({value: data[i].id, name: data[i].name});
+        console.log($scope.options.app );
+      });
+
+      $http.get('/C2VModel/5727fe943ee483cc1325aa32').success(function (data, status, headers, config) {
         $scope.model = _.pick(data, 'name', 'simulationSpec', 'networkModel', 'interVehicleModel', 'intraVehicleModel', 'cloudModel', 'compOffloadingModel');
       });
 
@@ -75,7 +82,8 @@ define([
         }],
         perfDist: [{
           value: 'Randomly'
-        }]
+        }],
+        app: []
       };
 
       $scope.startSimulation = function() {
@@ -85,61 +93,89 @@ define([
         }
         var base = new Date();
 
+        $scope.clear();
         $scope.options_gantt.fromDate = base;
         $scope.options_gantt.toDate = addSecond(base, $scope.model.simulationSpec.simulationTime);
-
+        console.log($scope.model.simulationSpec.app);
         $http.post('/C2VModel', $scope.model).success(function(data, status, header, config) {
-          $http.get('/C2VSim/C2VSim_Start_Multi?model='+data.id+'&app=5722fb189bd57fcd022cc5fc').success(function(data, status, headers, config) {
-            $scope.results = data;
-            for(var i = 0; i < data.task.length; ++i) {
-              var tasks = data.task[i];
-              var SLA = 500;
-              for(var j = 0; j < tasks.length; ++j) {
-                var task = tasks[j]
-                if(task.state !== 'end')
-                  continue;
-                var transtime = task.rxTime - task.txTime;
-                var transperc = 100;
-                var proctime = task.procEndTime - task.procStartTime;
-                var procperc = 100;
-                if(SLA < 0) {
-                  transperc = 0;
-                }
-                else if(SLA > transtime) {
-                  transperc = 100;
-                  SLA -= transtime;
-                }
-                else {
-                  transperc = SLA/transtime*100;
-                  SLA -= transtime;
-                }
+          $http.get('/C2VApp?name='+$scope.model.simulationSpec.app).success(function(_app, status, headers, config) {
+            $http.get('/C2VSim/C2VSim_Start_Multi?model=' + data.id + '&app='+_app[0].id).success(function (data, status, headers, config) {
 
-                if(SLA < 0) {
-                  procperc = 0;
-                }
-                else if(SLA > proctime) {
-                  procperc = 100;
-                  SLA -= proctime;
-                }
-                else {
-                  procperc = SLA/proctime*100;
-                  SLA -= proctime;
-                }
+              $scope.results = data;
+              for (var i = 0; i < data.task.length; ++i) {
+                var tasks = data.task[i];
+                var SLA = $scope.model.simulationSpec.SLA;
+                for (var j = 0; j < tasks.length; ++j) {
+                  var task = tasks[j]
+                  if (task.state !== 'end')
+                    continue;
+                  var transtime = task.rxTime - task.txTime;
+                  var transperc = 100;
+                  var proctime = task.procEndTime - task.procStartTime;
+                  var procperc = 100;
+                  if (SLA < 0) {
+                    transperc = 0;
+                  }
+                  else if (SLA > transtime) {
+                    transperc = 100;
+                    SLA -= transtime;
+                  }
+                  else {
+                    transperc = SLA / transtime * 100;
+                    SLA -= transtime;
+                  }
 
-                if(task.execLoc) {
-                  if(task.txTime !== task.rxTime)
-                    input['V'+task.vehicleID].push({name: 'tx', from: addSecond(base, task.txTime) , to: addSecond(base, task.rxTime), color: $scope.colors[0], progress: {percent: transperc, sub: '#FF0000'}});
-                  input['V'+task.vehicleID].push({name: 'VM'+task.VMID, from: addSecond(base, task.procStartTime) , to: addSecond(base, task.procEndTime), color: $scope.colors[1], progress: {percent: procperc, sub: '#FF0000'}})
-                }
-                else {
-                  if(task.txTime !== task.rxTime)
-                    input['V'+task.vehicleID].push({name: 'rx', from: addSecond(base, task.txTime) , to: addSecond(base, task.rxTime), color: $scope.colors[2], progress: {percent: transperc, sub: '#FF0000'}});
-                  input['V'+task.vehicleID].push({name: 'Local', from: addSecond(base, task.procStartTime) , to: addSecond(base, task.procEndTime), color: $scope.colors[3], progress: {percent: procperc, sub: '#FF0000'}})
+                  if (SLA < 0) {
+                    procperc = 0;
+                  }
+                  else if (SLA > proctime) {
+                    procperc = 100;
+                    SLA -= proctime;
+                  }
+                  else {
+                    procperc = SLA / proctime * 100;
+                    SLA -= proctime;
+                  }
+
+                  if (task.execLoc) {
+                    if (task.txTime !== task.rxTime)
+                      input['V' + task.vehicleID].push({
+                        name: 'tx',
+                        from: addSecond(base, task.txTime),
+                        to: addSecond(base, task.rxTime),
+                        color: $scope.colors[0],
+                        progress: {percent: transperc, sub: '#FF0000'}
+                      });
+                    input['V' + task.vehicleID].push({
+                      name: 'VM' + task.VMID,
+                      from: addSecond(base, task.procStartTime),
+                      to: addSecond(base, task.procEndTime),
+                      color: $scope.colors[1],
+                      progress: {percent: procperc, sub: '#FF0000'}
+                    })
+                  }
+                  else {
+                    if (task.txTime !== task.rxTime)
+                      input['V' + task.vehicleID].push({
+                        name: 'rx',
+                        from: addSecond(base, task.txTime),
+                        to: addSecond(base, task.rxTime),
+                        color: $scope.colors[2],
+                        progress: {percent: transperc, sub: '#FF0000'}
+                      });
+                    input['V' + task.vehicleID].push({
+                      name: 'Local',
+                      from: addSecond(base, task.procStartTime),
+                      to: addSecond(base, task.procEndTime),
+                      color: $scope.colors[3],
+                      progress: {percent: procperc, sub: '#FF0000'}
+                    })
+                  }
                 }
               }
-            }
-            console.log($scope.data);
-            $scope.addTasks(input);
+              console.log($scope.data);
+              $scope.addTasks(input);
+            });
           });
         });
       };

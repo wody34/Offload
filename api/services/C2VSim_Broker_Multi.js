@@ -4,8 +4,7 @@ var Random = require('simjs-random');
 
 var random = new Random(0);
 var LAMBDA = 700;
-var sim = new Sim();
-var stats = new Sim.Population();
+var sim;
 
 var _SimConfigTemplate = {
   networkThroughput: []
@@ -102,6 +101,7 @@ module.exports = {
         SimConfig = deepClone(_SimConfigTemplate);
         SimResult = deepClone(_SimResultTemplate);
         SimState = "Initial";
+        sim = new Sim();
         cb();
       },
       function appAccess(cb) {
@@ -126,7 +126,7 @@ module.exports = {
       function modelAccess(cb) {
         C2VModel.find(modelID).exec(function (err, models) {
           SimConfig.model = models[0];
-          vehicles = vehicleGenerator(SimConfig.model.intraVehicleModel, SimConfig.model.intraVehicleModel);
+          vehicles = vehicleGenerator(SimConfig.model.intraVehicleModel, SimConfig.model.interVehicleModel);
           vms = vmGenerator((SimConfig.model.cloudModel));
           // console.log(vehicles, vms);
           cb(err);

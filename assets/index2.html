@@ -51,12 +51,16 @@
                 <input type="text" class="form-control" ng-model="model.name" placeholder="Type Name" required/>
               </div>
               <div class="form-group">
+                <label>App Type</label>
+                <select class="form-control" ng-model="model.simulationSpec.app" ng-options="option.name as option.name for option in options.app"></select>
+              </div>
+              <div class="form-group">
                 <label>Simulation Time</label>
                 <input type="number" class="form-control" ng-model="model.simulationSpec.simulationTime" placeholder="Second" required/>
               </div>
               <div class="form-group">
-                <label>SLA Requirements</label>
-                <input type="number" class="form-control" ng-model="model.simulationSpec.simulationTime" placeholder="Second" required/>
+                <label>SLA Requirements (Deadline)</label>
+                <input type="number" class="form-control" ng-model="model.simulationSpec.SLA" placeholder="Second" required/>
               </div>
               <div class="form-group">
                 <label>Network Simulation Model</label>
@@ -176,6 +180,33 @@
     <div class="panel panel-warning">
       <div class="panel-heading">
         <h3 class="panel-title"><span><i class="fa fa-file-text"></i></span> C2V Simulation Results</h3>
+      </div><!-- /.panel-heading -->
+      <div class="panel-body">
+        <div class="form-group">
+          <label>TotalExecutionTime</label>
+          <input type="text" class="form-control" ng-model="results.totalExecutionTimeResult" placeholder="" />
+        </div>
+        <div class="form-group">
+          <label>Total Cloud Execution Time </label>
+          <input type="number" class="form-control" ng-model="results.totalCloudExecutionTimeResult" placeholder="" />
+        </div>
+        <div class="form-group">
+          <label>Total Cloud Cost</label>
+          <input type="number" class="form-control" ng-model="results.totalCloudCost" placeholder="" />
+        </div>
+        <div class="form-group">
+          <label>Cloud Utilization</label>
+          <input type="number" class="form-control" ng-model="results.cloudUtilization" placeholder="" />
+        </div>
+        <div class="form-group">
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="col-md-12">
+    <div class="panel panel-warning">
+      <div class="panel-heading">
+        <h3 class="panel-title"><span><i class="fa fa-file-text"></i></span> C2V Simulation RawData</h3>
       </div><!-- /.panel-heading -->
       <div class="panel-body">
         {{results}}
