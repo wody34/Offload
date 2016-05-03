@@ -9,6 +9,7 @@ requirejs.config({
     'googlemaps': 'https://maps.googleapis.com/maps/api/js?key=AIzaSyDNSBJPOcl5lsoHGGLNPRhIOKx28Lwk0Rc&signed_in=true',
     'angular': '/lib/angular.min',
     'uiBootstrap': '/lib/ui-bootstrap-tpls-1.3.2.min',
+    'underscore': '/lib/underscore-min',
     'angular-gantt': '/lib/angular-gantt/angular-gantt',
     'angular-moment': '/lib/angular-moment',
     'moment': '/lib/moment',
@@ -33,6 +34,9 @@ requirejs.config({
     'angular':{
       deps:['jquery'],
       exports:'angular'
+    },
+    'underscore': {
+      exports: '_'
     },
     'uiBootstrap':{
       deps:['jquery', 'angular']
@@ -86,7 +90,7 @@ requirejs.config({
       deps:['angular-gantt']
     },
     'app':{
-      deps:['angular', 'async!googlemaps', 'uiBootstrap',
+      deps:['angular', 'async!googlemaps', 'uiBootstrap', 'underscore', 'moment',
         'angular-gantt',
         'angular-gantt-table',
         'angular-gantt-resizeSensor',

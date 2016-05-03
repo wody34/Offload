@@ -3,98 +3,162 @@
   <title>C2V Middleware Demo</title>
   <meta name="viewport" content="initial-scale=1.0, user-scalable=no">
   <meta charset="utf-8">
+  <link href ="/css/font-awesome.min.css" rel="stylesheet">
   <link href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-1q8mTJOASx8j1Au+a5WDVnPi2lkFfwwEAa8hDDdjZlpLegxhjVME1fgjWPGmkzs7" crossorigin="anonymous">
+  <link href ="/lib/angular-gantt/angular-gantt.css" rel="stylesheet">
+  <link href ="/lib/angular-gantt/angular-gantt-table-plugin.css" rel="stylesheet">
+  <link href ="/lib/angular-gantt/angular-gantt-tree-plugin.css" rel="stylesheet">
+  <link href ="/lib/angular-gantt/angular-gantt-bounds-plugin.css" rel="stylesheet">
+  <link href ="/lib/angular-gantt/angular-gantt-dependencies-plugin.css" rel="stylesheet">
+  <link href ="/lib/angular-gantt/angular-gantt-groups-plugin.css" rel="stylesheet">
+  <link href ="/lib/angular-gantt/angular-gantt-labels-plugin.css" rel="stylesheet">
+  <link href ="/lib/angular-gantt/angular-gantt-movable-plugin.css" rel="stylesheet">
+  <link href ="/lib/angular-gantt/angular-gantt-overlap-plugin.css" rel="stylesheet">
+  <link href ="/lib/angular-gantt/angular-gantt-plugins.css" rel="stylesheet">
+  <link href ="/lib/angular-gantt/angular-gantt-progress-plugin.css" rel="stylesheet">
+  <link href ="/lib/angular-gantt/angular-gantt-sortable-plugin.css" rel="stylesheet">
+  <link href ="/lib/angular-gantt/angular-gantt-tooltips-plugin.css" rel="stylesheet">
+  <style>
+    .row{
+      overflow: hidden;
+    }
+
+    [class*="col-"]{
+      margin-bottom: -99999px;
+      padding-bottom: 99999px;
+    }
+  </style>
 </head>
 <body>
-<div class="box box-primary" ng-controller="C2VSim">
-  <div class="box-header">
-    <h3 class="box-title">C2V Connected Car Integrated Simulator</h3>
+<div class="panel panel-primary col-md-12" ng-controller="C2VSim">
+  <div class="panel-heading">
+    <h3 class="panel-title">C2V Connected Car Integrated Simulator</h3>
   </div>
-  <!-- /.box-header -->
-  <div class="box-body" >
-    <div class="col-md-12">
-      <form role="form" ng-submit="startSimulation()">
-        <!-- general form elements disabled -->
-        <div class="box box-danger">
-          <div class="box-header">
-            <h3 class="box-title"><i class="fa fa-file-text fa-stack-1x fa-inverse"></i></span> C2V Simulation Model</h3>
-          </div><!-- /.box-header -->
-          <div class="box-body">
-            <!-- text input -->
-            <div class="form-group">
-              <label>Name</label>
-              <input type="text" class="form-control" ng-model="model.name" placeholder="Type Name"/>
-            </div>
-            <div class="form-group">
-              <label>Simulation Time</label>
-              <input type="text" class="form-control" ng-model="model.simulationSpec.simulationTime" placeholder="Second"/>
-            </div>
-            <div class="form-group">
-              <label>Inter-Vehicle Model</label>
-              <select class="form-control" ng-model="model.interVehicleModel.model" ng-options="option.value as option.value for option in options.interVehicleModel"></select>
-              <label>Vehicle Number</label>
-              <input type="text" class="form-control" ng-model="model.interVehicleModel.vehicleNumber" placeholder="Number"/>
-            </div>
-            <div class="form-group">
-              <label>Intra-Vehicle Model</label>
-              <select class="form-control" ng-model="model.intraVehicleModel.model" ng-options="option.value as option.value for option in options.intraVehicleModel"></select>
-              <label>Vehicle Number</label>
-              <input type="text" class="form-control" ng-model="model.interVehicleModel.vehicleNumber" placeholder="Number"/>
-              <label>Min MIPS</label>
-              <input type="text" class="form-control" ng-model="model.intraVehicleModel.minMIPS" placeholder="Number"/>
-              <label>Max MIPS</label>
-              <input type="text" class="form-control" ng-model="model.intraVehicleModel.maxMIPS" placeholder="Number"/>
-            </div>
-            <div class="form-group">
-              <label>Computational Offloading Model</label>
-              <select class="form-control" ng-model="model.compOffloading.model" ng-options="option.value as option.value for option in options.compOffloadingModel"></select>
-            </div>
-            <!-- radio -->
-          </div>
-          <div  class="box box-success">
-            <div class="box-body">
-              <button class="btn btn-success btn-block">Registration</button>
-            </div>
-          </div>
-        </div>
-      </form>
+  <!-- /.panel-heading -->
+  <div class="panel-body">
+    <div class="row">
+      <div class="col-md-12">
+        <form role="form" ng-submit="startSimulation()">
+          <!-- general form elements disabled -->
+          <div class="panel panel-danger">
+            <div class="panel-heading">
+              <h3 class="panel-title"><span><i class="fa fa-file-text"></i></span> C2V Simulation Model</h3>
+            </div><!-- /.panel-heading -->
+            <div class="panel-body">
+              <!-- text input -->
+              <div class="form-group">
+                <label>Name</label>
+                <input type="text" class="form-control" ng-model="model.name" placeholder="Type Name" required/>
+              </div>
+              <div class="form-group">
+                <label>Simulation Time</label>
+                <input type="number" class="form-control" ng-model="model.simulationSpec.simulationTime" placeholder="Second" required/>
+              </div>
+              <div class="form-group">
+                <label>Network Simulation Model</label>
+                <select class="form-control" ng-model="model.networkModel.model" ng-options="option.value as option.value for option in options.networkModel"></select>
 
-    <div class="panel panel-default">
-      <div class="panel-body">
-        {{results}}
+              </div>
+              <div class="form-group">
+                <label>Inter-Vehicle Simulation Model</label>
+                <select class="form-control" ng-model="model.interVehicleModel.model" ng-options="option.value as option.value for option in options.interVehicleModel"></select>
+                <label>Number of Vehicles</label>
+                <input type="number" class="form-control" ng-model="model.interVehicleModel.vehicleNumber" placeholder="Number" required/>
+              </div>
+              <div class="form-group">
+                <label>Intra-Vehicle Computing Simulation Model</label>
+                <select class="form-control" ng-model="model.intraVehicleModel.model" ng-options="option.value as option.value for option in options.executionModel" required></select>
+                <label>Min MIPS</label>
+                <input type="number" class="form-control" ng-model="model.intraVehicleModel.minMIPS" placeholder="Number" required/>
+                <label>Max MIPS</label>
+                <input type="number" class="form-control" ng-model="model.intraVehicleModel.maxMIPS" placeholder="Number" required/>
+              </div>
+              <div class="form-group">
+                <table>
+                  <tr>
+                    <th>Cloud Type</th>
+                    <th>Instance Type</th>
+                    <th>Unit Price ($/hour)</th>
+                    <th>Minimum MIPS</th>
+                    <th>Maximum MIPS</th>
+                    <th>Distribution of System Performance</th>
+                    <th>Available Number of VM Instance</th>
+                    <th>Cloud Simulation Model</th>
+                    <th>Remove</th>
+                  </tr>
+                  <tr ng-repeat="cloudModel in model.cloudModel">
+                    <td><input type="text" class="form-control" ng-model="cloudModel.cloudType" placeholder="CloudType" required/></td>
+                    <td><input type="text" class="form-control" ng-model="cloudModel.instanceType" placeholder="InstanceType" required/></td>
+                    <td><input type="number" class="form-control" ng-model="cloudModel.compPricing" step="any"  placeholder="Price" required/></td>
+                    <td><input type="number" class="form-control" ng-model="cloudModel.minMIPS" placeholder="minMIPS" required/></td>
+                    <td><input type="number" class="form-control" ng-model="cloudModel.maxMIPS" placeholder="maxMIPS" required/></td>
+                    <td><select class="form-control" ng-model="cloudModel.nodeSelection" ng-options="option.value as option.value for option in options.perfDist" required></select></td>
+                    <td><input type="number" class="form-control" ng-model="cloudModel.availableVMNumber" placeholder="availableVMNumber" required/></td>
+                    <td><select class="form-control" ng-model="cloudModel.model" ng-options="option.value as option.value for option in options.executionModel" required></select></td>
+                    <td><button class="btn btn-danger form-control" ng-click="removeIndex($index)"><i class="fa fa-ban"></i></button></td>
+                  </tr>
+                </table>
+                <button class="btn btn-warning btn-block" ng-click="model.cloudModel.push({})">Add Input Interface</button>
+              </div>
+              <div class="form-group">
+                <label>Computational Offloading Model</label>
+                <select class="form-control" ng-model="model.compOffloadingModel.model" ng-options="option.value as option.value for option in options.compOffloadingModel"></select>
+              </div>
+              <!-- radio -->
+            </div>
+            <div  class="panel panel-success">
+              <div class="panel-body">
+                <button class="btn btn-success btn-block">Execute Simulcation</button>
+              </div>
+            </div>
+          </div>
+        </form>
       </div>
     </div>
-    <div class="container-content" ng-cloak="true">
-      <div class="container-fluid">
-        <div class="row">
-          <div class="col-sm-12">
-            <div class="panel-group" bs-collapse>
-              <div class="panel panel-default">
-                <div class="panel-heading">
-                  <h4 class="panel-title">Timeline</h4>
-                  <button class="btn btn-default" ng-click="testFunction()">Test</button>
-                </div>
-                <div class="panel-collapse" bs-collapse-target>
-                  <div class="panel-body">
-                    <div gantt data="data"
-                         show-side="true"
-                         view-scale="'second'"
-                         auto-expand="'none'"
-                         headers="['day', 'minute', 'second']"
-                         max-height="options.maxHeight"
-                         headers-formats="headersFormats"
-                         api="registerApi"
-                         from-date="options.fromDate"
-                         to-date="options.toDate">
-                      <gantt-table enabled="true"
-                                   columns="['model.name']"
-                                   headers="{'model.name' : 'Name'}"
-                                   header-contents="{'model.name': '{{getHeader()}}'}">
-                      </gantt-table>
-                      <gantt-resize-sensor></gantt-resize-sensor>
-                      <gantt-tooltips></gantt-tooltips>
-                      <gantt-bounds></gantt-bounds>
-                    </div>
+  </div>
+  <!--<div class="col-md-12">-->
+  <!--<div class="panel panel-warning">-->
+  <!--<div class="panel-heading">-->
+  <!--<h3 class="panel-title"><span><i class="fa fa-file-text fa-stack-1x fa-inverse"></i></span> C2V Simulation Model</h3>-->
+  <!--</div>&lt;!&ndash; /.panel-heading &ndash;&gt;-->
+  <!--<div class="panel-body">-->
+  <!--{{results}}-->
+  <!--</div>-->
+  <!--</div>-->
+  <!--</div>-->
+  <div class="container-content" ng-cloak="true">
+    <div class="container-fluid">
+      <div class="row">
+        <div class="col-sm-12">
+          <div class="panel-group" bs-collapse>
+            <div class="panel panel-default">
+              <div class="panel-heading">
+                <h4 class="panel-title">Timeline</h4>
+              </div>
+              <div class="panel-collapse" bs-collapse-target>
+                <div class="panel-body">
+                  <div gantt data="data"
+                       show-side="true"
+                       view-scale="'second'"
+                       auto-expand="'none'"
+                       headers="['day', 'minute', 'second']"
+                       max-height="options_gantt.maxHeight"
+                       headers-formats="headersFormats"
+                       api="registerApi"
+                       from-date="options_gantt.fromDate"
+                       to-date="options_gantt.toDate">
+                    <gantt-table enabled="true"
+                                 columns="['model.name']"
+                                 headers="{'model.name' : 'Name'}"
+                                 header-contents="{'model.name': '{{getHeader()}}'}">
+                    </gantt-table>
+                    <gantt-resize-sensor></gantt-resize-sensor>
+                    <gantt-tooltips></gantt-tooltips>
+                    <gantt-bounds></gantt-bounds>
+                    <gantt-tooltips
+                      enabled="true"
+                      date-format="options_gantt.tooltipForm"></gantt-tooltips>
+                    <gantt-progress></gantt-progress>
                   </div>
                 </div>
               </div>
@@ -104,22 +168,18 @@
       </div>
     </div>
   </div>
+  <div class="col-md-12">
+    <div class="panel panel-warning">
+      <div class="panel-heading">
+        <h3 class="panel-title"><span><i class="fa fa-file-text"></i></span> C2V Simulation Results</h3>
+      </div><!-- /.panel-heading -->
+      <div class="panel-body">
+        {{results}}
+      </div>
+    </div>
+  </div>
 </div>
 
-
 <script data-main="js/bootstrap" src="lib/require.js"></script>
-<link href ="/lib/angular-gantt/angular-gantt.css" rel="stylesheet">
-<link href ="/lib/angular-gantt/angular-gantt-table-plugin.css" rel="stylesheet">
-<link href ="/lib/angular-gantt/angular-gantt-tree-plugin.css" rel="stylesheet">
-<link href ="/lib/angular-gantt/angular-gantt-bounds-plugin.css" rel="stylesheet">
-<link href ="/lib/angular-gantt/angular-gantt-dependencies-plugin.css" rel="stylesheet">
-<link href ="/lib/angular-gantt/angular-gantt-groups-plugin.css" rel="stylesheet">
-<link href ="/lib/angular-gantt/angular-gantt-labels-plugin.css" rel="stylesheet">
-<link href ="/lib/angular-gantt/angular-gantt-movable-plugin.css" rel="stylesheet">
-<link href ="/lib/angular-gantt/angular-gantt-overlap-plugin.css" rel="stylesheet">
-<link href ="/lib/angular-gantt/angular-gantt-plugins.css" rel="stylesheet">
-<link href ="/lib/angular-gantt/angular-gantt-progress-plugin.css" rel="stylesheet">
-<link href ="/lib/angular-gantt/angular-gantt-sortable-plugin.css" rel="stylesheet">
-<link href ="/lib/angular-gantt/angular-gantt-tooltips-plugin.css" rel="stylesheet">
 </body>
 </html>

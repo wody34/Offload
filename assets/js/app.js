@@ -3,7 +3,9 @@
 //requireJS 모듈 선언 - [myApp 앵귤러 모듈]
 define([
     'angular', //앵귤러 모듈을 사용하기 위해 임포트
+    'moment',
     'uiBootstrap',
+    'underscore',
     'angular-gantt',
     'angular-gantt-table',
     'angular-gantt-labels',
@@ -22,7 +24,7 @@ define([
   ],
 
   //디펜던시 로드뒤 콜백함수
-  function (angular) {
+  function (angular, moment) {
     //모듈 선언
     var $app = angular.module('blindMotion', ['ui.bootstrap', 'gantt',
       'gantt.sortable',
@@ -38,11 +40,13 @@ define([
 
     $app.controller('C2VSim', ['$scope', '$http', function($scope, $http){
       $scope.data = [];
-      $scope.options = {
+      $scope.options_gantt = {
         maxHeight: 400,
         fromDate: new Date(),
-        toDate: new Date()
+        toDate: new Date(),
+        tooltipForm: 'MMM DD, HH:mm:ss'
       };
+      $scope.colors = ['#5cb85c', '#f0ad4e', '#337ab7', '#d9534f'];
 
       $scope.headersFormats = {
         day: 'MMMM D',
@@ -50,121 +54,138 @@ define([
         second:'ss'
       };
 
-      $http.get('/C2VModel/57248f265b194a081cd13777').success(function (data, status, headers, config) {
-        console.log(data);
-        $scope.model = data;
+      $http.get('/C2VModel/5727027bd8e215873370b3da').success(function (data, status, headers, config) {
+        $scope.model = _.pick(data, 'name', 'simulationSpec', 'networkModel', 'interVehicleModel', 'intraVehicleModel', 'cloudModel', 'compOffloadingModel');
       });
 
       $scope.options = {
+        networkModel: [{
+          value: 'OMNET++'
+        }],
         interVehicleModel: [{
           value: 'SUMO'
         }, {
           value: 'other'
         }],
-        intraVehicleModel: [{
+        executionModel: [{
           value: 'iCanCloud'
         }],
         compOffloadingModel: [{
           value: 'ModifiedMAUI1'
+        }],
+        perfDist: [{
+          value: 'Randomly'
         }]
       };
 
       $scope.startSimulation = function() {
-        $http.get('/C2VSim/C2VSim_Start_Multi?model=57248f265b194a081cd13777&app=5722fb189bd57fcd022cc5fc').success(function(data, status, headers, config) {
-          $scope.results = data;
+        var input = {};
+        for(var i = 0; i < $scope.model.interVehicleModel.vehicleNumber; ++i) {
+          input['V'+i] = [];
+        }
+        var base = new Date();
+
+        $scope.options_gantt.fromDate = base;
+        $scope.options_gantt.toDate = addSecond(base, $scope.model.simulationSpec.simulationTime);
+
+        $http.post('/C2VModel', $scope.model).success(function(data, status, header, config) {
+          $http.get('/C2VSim/C2VSim_Start_Multi?model='+data.id+'&app=5722fb189bd57fcd022cc5fc').success(function(data, status, headers, config) {
+            $scope.results = data;
+            for(var i = 0; i < data.task.length; ++i) {
+              var tasks = data.task[i];
+              var SLA = 500;
+              for(var j = 0; j < tasks.length; ++j) {
+                var task = tasks[j]
+                if(task.state !== 'end')
+                  continue;
+                var transtime = task.rxTime - task.txTime;
+                var transperc = 100;
+                var proctime = task.procEndTime - task.procStartTime;
+                var procperc = 100;
+                if(SLA < 0) {
+                  transperc = 0;
+                }
+                else if(SLA > transtime) {
+                  transperc = 100;
+                  SLA -= transtime;
+                }
+                else {
+                  transperc = SLA/transtime*100;
+                  SLA -= transtime;
+                }
+
+                if(SLA < 0) {
+                  procperc = 0;
+                }
+                else if(SLA > proctime) {
+                  procperc = 100;
+                  SLA -= proctime;
+                }
+                else {
+                  procperc = SLA/proctime*100;
+                  SLA -= proctime;
+                }
+
+                if(task.execLoc) {
+                  if(task.txTime !== task.rxTime)
+                    input['V'+task.vehicleID].push({name: 'tx', from: addSecond(base, task.txTime) , to: addSecond(base, task.rxTime), color: $scope.colors[0], progress: {percent: transperc, sub: '#FF0000'}});
+                  input['V'+task.vehicleID].push({name: 'VM'+task.VMID, from: addSecond(base, task.procStartTime) , to: addSecond(base, task.procEndTime), color: $scope.colors[1], progress: {percent: procperc, sub: '#FF0000'}})
+                }
+                else {
+                  if(task.txTime !== task.rxTime)
+                    input['V'+task.vehicleID].push({name: 'rx', from: addSecond(base, task.txTime) , to: addSecond(base, task.rxTime), color: $scope.colors[2], progress: {percent: transperc, sub: '#FF0000'}});
+                  input['V'+task.vehicleID].push({name: 'Local', from: addSecond(base, task.procStartTime) , to: addSecond(base, task.procEndTime), color: $scope.colors[3], progress: {percent: procperc, sub: '#FF0000'}})
+                }
+              }
+            }
+            console.log($scope.data);
+            $scope.addTasks(input);
+          });
         });
+      };
+
+      function addSecond(base, sec) {
+        return moment(base).add(parseInt(sec), 's').toDate();
       }
 
-      $scope.testFunction = function(){
-        var length = $scope.data.length;
-        if(length == 0 || Math.random() > 0.5){
-          $scope.addRow('row'+length);
-          /*$scope.addRow('row'+(length+1));
-           $scope.addRow('row'+(length+2));
-           $scope.addRow('row'+(length+3));
-           $scope.addRow('row'+(length+4));
-           $scope.addRow('row'+(length+5));
-           $scope.addRow('row'+(length+6));
-           $scope.addRow('row'+(length+7));
-           $scope.addRow('row'+(length+8));
-           $scope.addRow('row'+(length+9));
-           $scope.addRow('row'+(length+10));*/
-        }
+      function rgb(r, g, b) {
+        return '#' + rand_r.toString(16) + rand_g.toString(16) + rand_b.toString(16);
+      }
 
-        var targetRow = 'row' + Math.floor(Math.random() * length);
-        for(var key in $scope.data){
-          if($scope.data[key].name == targetRow){
-            var rand_r = (Math.floor(Math.random() * 255));
-            var rand_g = (Math.floor(Math.random() * 255));
-            var rand_b = (Math.floor(Math.random() * 255));
-            var rand_color = '#' + rand_r.toString(16) + rand_g.toString(16) + rand_b.toString(16);
 
-            var tmp_tsk = {
-              'name': 'randTask',
-              'from': new Date(),
-              'to': new Date(),
-              'color': rand_color
-            };
-
-            if(tmp_tsk.to.getSeconds() <= 59)
-              tmp_tsk.to.setSeconds(tmp_tsk.to.getSeconds() + 1);
-            else
-              tmp_tsk.from.setSeconds(0);
-
-            var tmp_obj = {};
-            tmp_obj[targetRow] = [tmp_tsk];
-
-            $scope.addTasksToRow(tmp_obj);
-
-            break;
-          }
-        }
+      $scope.removeIndex = function($index) {
+        delete $scope.model.cloudModel[$index];
+        $scope.model.cloudModel = _.compact($scope.model.cloudModel);
       };
 
-      $scope.addRow = function(_name){
-        var tmp = {};
-        tmp.name = _name;
-        tmp.tasks = [];
-        return $scope.data.push(tmp);
+      $scope.data_dic = {
       };
 
-      $scope.addTasksToRow = function(_tasks){
+      $scope.clear = function(){
+        $scope.data = [];
+        $scope.data_dic = {};
+      };
+
+      $scope.addTasks = function(_tasks){
         for(var key in _tasks){
-          var exist = false;
-          for(var index in $scope.data){
-            if($scope.data[index].name == key){
-              exist = true;
-              var target_row = $scope.data[index];
-              while(_tasks[key].length != 0){
-                target_row.tasks.push(_tasks[key].pop());
-              }
-              console.log(target_row.tasks);
-              /*$scope.data[index].tasks = $scope.data[index].tasks.concat(_tasks[key]);*/
-              break;
+          if($scope.data_dic[key] == undefined){
+            var tmp = {};
+            tmp.name = key;
+            tmp.tasks = [];
+            while(_tasks[key].length != 0){
+              tmp.tasks.push(_tasks[key].pop());
             }
+            $scope.data.push(tmp);
+            $scope.data_dic[key] = $scope.data.length - 1;
           }
-          if(!exist) {
-            var target_row = $scope.addRow(key);
+          else{
+            var index = $scope.data_dic[key];
+            var target_row = $scope.data[index];
             while(_tasks[key].length != 0){
               target_row.tasks.push(_tasks[key].pop());
             }
           }
-        }
-        $scope.options.toDate = new Date();
-      };
-
-      $scope.registerApi = function(api){
-        $scope.api = api;
-        console.log(api);
-        api.data.on.change($scope, function(){
-          console.log('data.on.change');
-        });
-
-        api.tasks.on.add($scope, function(){
-          api.columns.refresh();
-          api.rows.refresh();
-          console.log('tasks.on.add');
-        });
+        };
       };
     }]);
 

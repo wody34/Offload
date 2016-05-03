@@ -1092,7 +1092,7 @@ Github: https://github.com/angular-gantt/angular-gantt.git
 
                 api.directives.on.new(scope, function(directiveName, taskScope, taskElement) {
                     if (directiveName === 'ganttTaskBackground') {
-                        var progressScope = taskScope.$new();
+                       var progressScope = taskScope.$new();
                         progressScope.pluginScope = scope;
 
                         var ifElement = $document[0].createElement('div');
@@ -1106,6 +1106,12 @@ Github: https://github.com/angular-gantt/angular-gantt.git
                             angular.element(progressElement).attr('data-template', attrs.template);
                         }
                         angular.element(ifElement).append(progressElement);
+
+                      //suki
+                      if(taskScope.task.model.progress !== undefined && taskScope.task.model.progress.sub !== undefined) {
+                        var progressElement2 = '<div class="gantt-task-progress ng-scope" style="width: 100%; z-index: 9; background-color: '+ taskScope.task.model.progress.sub +';"></div>';
+                        angular.element(ifElement).append(progressElement2);
+                      }
                         taskElement.append($compile(ifElement)(progressScope));
                     }
                 });

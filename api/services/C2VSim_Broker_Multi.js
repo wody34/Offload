@@ -35,6 +35,9 @@ var OffloadingMethod = {
     var solution = 0;
     var objectiveValue = Number.MAX_VALUE;
 
+    if(test_vm === null)
+      return OffloadingMethod.noOffloading();
+
     var unfeasibility = 0;
     for(var i in taskArray)
       unfeasibility += ((taskArray[i].attr ^ 1) << i);
@@ -123,7 +126,7 @@ module.exports = {
       function modelAccess(cb) {
         C2VModel.find(modelID).exec(function (err, models) {
           SimConfig.model = models[0];
-          vehicles = vehicleGenerator(SimConfig.model.intraVehicleModel);
+          vehicles = vehicleGenerator(SimConfig.model.intraVehicleModel, SimConfig.model.intraVehicleModel);
           vms = vmGenerator((SimConfig.model.cloudModel));
           // console.log(vehicles, vms);
           cb(err);
@@ -154,11 +157,11 @@ function deepClone(obj) {
   return JSON.parse(JSON.stringify(obj));
 }
 
-function vehicleGenerator(intraVehicleModel) {
+function vehicleGenerator(intraVehicleModel, interVehicleModel) {
   var vehicles = [];
   var max = intraVehicleModel.maxMIPS;
   var min = intraVehicleModel.minMIPS;
-  for(var i = 0; i < intraVehicleModel.vehicleNumber; ++i) {
+  for(var i = 0; i < interVehicleModel.vehicleNumber; ++i) {
     (function() {
       var id = i;
       var model = intraVehicleModel.model;
@@ -174,14 +177,13 @@ function vehicleGenerator(intraVehicleModel) {
           this.setTimer(nextArrivalAt).done(this.generateTask, this);
         },
         generateTask: function() {
-          var nextArrivalAt = random.exponential(1.0 / LAMBDA);
           var time = this.time();
-          console.log("New task gen at", this.id, this.MIPS, this.time(), nextArrivalAt);
           sim.log("New Task gen");
           var task = [];
           SimResult.totalState = "execution";
 
           var test_vm = selectBestVM();
+          console.log(test_vm)
           var offloading = OffloadingMethod.allOffloading(test_vm);
           var appID = _.uniqueId()
           for (var i = 0; i < SimConfig.app.length; ++i) {
@@ -190,7 +192,8 @@ function vehicleGenerator(intraVehicleModel) {
               executionTimeResult: 0,
               dataTransferResult: 0,
               offloading: (offloading >> i) & 1,
-              id: appID + "-" + _.uniqueId()
+              id: this.id + "-" + _.uniqueId(),
+              vehicleID: this.id
             }));
           }
           task.id = appID;
@@ -201,7 +204,6 @@ function vehicleGenerator(intraVehicleModel) {
           // console.log(task);
           this.setTimer(0).done(this.taskStart, this, [task]);
 
-          this.setTimer(nextArrivalAt).done(this.generateTask, this);
         },
         onMessage: function (sender, message) {
           // Receive message, add own name and send back
@@ -235,10 +237,11 @@ function vehicleGenerator(intraVehicleModel) {
         },
         taskEnd: function(task) {
           console.log(_.template('[Task<%= id %>] End process at vehicle[<%= receiver %>]')({id: task[task.cur].id, receiver: this.id}));
-
           var time = this.time();
           task[task.cur].procEndTime = time;
+          task[task.cur].state = "end";
           ++task.cur;
+
 
           if(_.isUndefined(task[task.cur])) {
             task.dataTransferResult = 0;
@@ -259,6 +262,9 @@ function vehicleGenerator(intraVehicleModel) {
             SimResult.totalCloudCost += task.totalCloudCost;
             SimResult.totalExecutionTimeResult += task.executionTimeResult + task.dataTransferResult;
             console.log(task);
+            var nextArrivalAt = random.exponential(1.0 / LAMBDA);
+            this.setTimer(nextArrivalAt).done(this.generateTask, this);
+
           }
           else {
             task[task.cur].txTime = time;
@@ -270,7 +276,7 @@ function vehicleGenerator(intraVehicleModel) {
       vehicles.push(new_vehicle);
     })();
   }
-  console.log(_.template("[Generate]: #<%= length %> of Vehicle Entity type of with MIPS(<%= min %>,<%= max %>)")({length:intraVehicleModel.vehicleNumber, min:min, max:max}));
+  console.log(_.template("[Generate]: #<%= length %> of Vehicle Entity type of with MIPS(<%= min %>,<%= max %>)")({length:interVehicleModel.vehicleNumber, min:min, max:max}));
   return vehicles;
 }
 
@@ -314,6 +320,7 @@ function vmGenerator(cloudModel) {
             var time = this.time();
             task[task.cur].rxTime = task[task.cur].procStartTime = time;
             task[task.cur].execLoc = 1;
+            task[task.cur].VMID = this.id;
             task[task.cur].compPricing = this.compPricing;
             var executionTime = ExecutionTimeMethod.cloud[this.model]({MI: task[task.cur].MI, MIPS: this.MIPS});
             this.setTimer(executionTime).done(this.taskEnd, this, [sender, task]);
@@ -323,6 +330,7 @@ function vmGenerator(cloudModel) {
 
             var time = this.time();
             task[task.cur].procEndTime = time;
+            task[task.cur].state = "end";
             ++task.cur;
             task[task.cur].txTime = time;
             if(task[task.cur].offloading === 0) {
