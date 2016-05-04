@@ -6,7 +6,7 @@ requirejs.config({
   'paths': {
     'async': '/lib/requirejs-plugins/async',
     'jquery': '//ajax.googleapis.com/ajax/libs/jquery/2.2.2/jquery.min',
-    'googlemaps': 'https://maps.googleapis.com/maps/api/js?key=AIzaSyDNSBJPOcl5lsoHGGLNPRhIOKx28Lwk0Rc&signed_in=true',
+    // 'googlemaps': 'https://maps.googleapis.com/maps/api/js?key=AIzaSyDNSBJPOcl5lsoHGGLNPRhIOKx28Lwk0Rc&signed_in=true',
     'angular': '/lib/angular.min',
     'uiBootstrap': '/lib/ui-bootstrap-tpls-1.3.2.min',
     'underscore': '/lib/underscore-min',
@@ -90,7 +90,8 @@ requirejs.config({
       deps:['angular-gantt']
     },
     'app':{
-      deps:['angular', 'async!googlemaps', 'uiBootstrap', 'underscore', 'moment',
+      deps:['angular', 'uiBootstrap', 'underscore', 'moment',
+        // 'async!googlemaps',
         'angular-gantt',
         'angular-gantt-table',
         'angular-gantt-resizeSensor',

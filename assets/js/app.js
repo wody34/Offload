@@ -61,7 +61,7 @@ define([
         console.log($scope.options.app );
       });
 
-      $http.get('/C2VModel/5727fe943ee483cc1325aa32').success(function (data, status, headers, config) {
+      $http.get('/C2VModel/5728361663d71f5b169dfe3e').success(function (data, status, headers, config) {
         $scope.model = _.pick(data, 'name', 'simulationSpec', 'networkModel', 'interVehicleModel', 'intraVehicleModel', 'cloudModel', 'compOffloadingModel');
       });
 
