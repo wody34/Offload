@@ -231,7 +231,7 @@ define([
         var speed = 1;
         var vid = document.getElementById("drive_video");
         // vid.playbackRate = speed;
-        vid.src = "/video/2016-04-26_drive.mp4";
+        // vid.src = "/video/2016-04-26_drive.mp4";
 
         $http.get('/blindmotion/2016-04-26_SensorDatafile_smooth.csv').success(function (data, status, headers, config) {
           $http.get('/blindmotion/2016-04-26_events.json').success(function (eventData, status, headers, config) {
