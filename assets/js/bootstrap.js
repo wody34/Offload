@@ -90,7 +90,8 @@ requirejs.config({
       deps:['angular-gantt']
     },
     'app':{
-      deps:['angular', 'async!googlemaps', 'uiBootstrap', 'underscore', 'moment',
+      deps:['angular', 'uiBootstrap', 'underscore', 'moment',
+        'async!googlemaps',
         'angular-gantt',
         'angular-gantt-table',
         'angular-gantt-resizeSensor',

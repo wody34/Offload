@@ -49702,6 +49702,7 @@ define("libs/json2", function(){});
 
       function FileHandler(nodes, group_definitions) {
         this.nodes = nodes;
+        this.app = "";
         this.group_definitions = group_definitions;
         this.makeModelJsonData = __bind(this.makeModelJsonData, this);
         this.makeAppJsonData = __bind(this.makeAppJsonData, this);
@@ -49767,6 +49768,7 @@ define("libs/json2", function(){});
         var connection, def, delay, grp, grp_def, loaded_data, node, _i, _j, _k, _len, _len1, _len2, _ref, _ref1, _ref2,
           _this = this;
         loaded_data = JSON.parse(txt);
+        this.app = loaded_data.app;
         if (loaded_data.groups) {
           _ref = loaded_data.groups;
           for (_i = 0, _len = _ref.length; _i < _len; _i++) {
@@ -49829,7 +49831,9 @@ define("libs/json2", function(){});
 
       FileHandler.prototype.getStateSuccess = function(data) {
         var node, res_data, vertex, _i, _j, _k, _l, _len, _len1, _len2, _len3, _ref, _ref1, _ref2, _ref3;
+        console.log(data)
         res_data = data;
+        // res_data = JSON.parse(data);
         if (res_data.SimState === "Offloading All Possible Vertices") {
           this._interface.displaySimstate(3);
         } else if (res_data.SimState === "No Offloading") {
@@ -49904,16 +49908,17 @@ define("libs/json2", function(){});
       };
 
       FileHandler.prototype.execFunction = function() {
+        
         $.ajax({
           type: "GET",
-          url: "/C2VSim/C2VSim_Start?model=574fe5393504d9050358f3c2&app=574fe4ee556498f102dcbda1",
+          url: "/C2VSim/C2VSim_Start?model=5722fb049bd57fcd022cc5fa&app="+this.app,
           success: this.saveFinalResult
         });
         return this.simul_timer = setInterval(this.getState, 1000);
       };
 
       FileHandler.prototype.saveFinalResult = function(res_data) {
-        this._interface.saveResult(JSON.parse(res_data), 'result');
+        this._interface.saveResult(res_data, 'result');
         return $.ajax({
           type: "GET",
           url: "/C2VSim/C2VSim_NetworkThroughput",
@@ -49923,7 +49928,7 @@ define("libs/json2", function(){});
 
       FileHandler.prototype.saveNetResult = function(res_data) {
         console.log(res_data);
-        return this._interface.saveResult(JSON.parse(res_data), 'net');
+        return this._interface.saveResult(res_data, 'net');
       };
 
       FileHandler.prototype.registData = function() {

@@ -61,9 +61,8 @@ define([
         console.log($scope.options.app );
       });
 
-      $http.get('/C2VModel/574fdf96848b024c021d71a4').success(function (data, status, headers, config) {
+      $http.get('/C2VModel/5728361663d71f5b169dfe3e').success(function (data, status, headers, config) {
         $scope.model = _.pick(data, 'name', 'simulationSpec', 'networkModel', 'interVehicleModel', 'intraVehicleModel', 'cloudModel', 'compOffloadingModel');
-        console.log('test', $scope.model.simulationSpec.simulationTime);
       });
 
       $scope.options = {
@@ -232,7 +231,7 @@ define([
         var speed = 1;
         var vid = document.getElementById("drive_video");
         // vid.playbackRate = speed;
-        vid.src = "/video/2016-04-26_drive.mp4";
+        // vid.src = "/video/2016-04-26_drive.mp4";
 
         $http.get('/blindmotion/2016-04-26_SensorDatafile_smooth.csv').success(function (data, status, headers, config) {
           $http.get('/blindmotion/2016-04-26_events.json').success(function (eventData, status, headers, config) {
