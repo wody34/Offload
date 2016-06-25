@@ -16,7 +16,7 @@ var _SimResultTemplate = {
 var SimState = "Initial";
 var SimConfig = {};
 var SimResult = {totalState: "wait"};
-var sleepSec = 0.1;
+var sleepSec = 1;
 var OffloadingMethod = {
   noOffloading: function() {
     return 0;
@@ -97,6 +97,7 @@ module.exports = {
           SimConfig.model = models[0]
           cb(err);
         })
+        return null;
       },
       function appAccess(cb) {
         C2VApp.find(appID).exec(function (err, apps) {

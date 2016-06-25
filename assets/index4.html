@@ -1,0 +1,132 @@
+<html>
+<head>
+  <title>C2V Middleware Demo</title>
+  <meta name="viewport" content="initial-scale=1.0, user-scalable=no">
+  <meta charset="utf-8">
+  <script src="https://www.amcharts.com/lib/3/amcharts.js"></script>
+  <script src="https://www.amcharts.com/lib/3/serial.js"></script>
+  <script src="https://www.amcharts.com/lib/3/themes/light.js"></script>
+  <link href ="/css/font-awesome.min.css" rel="stylesheet">
+  <link href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-1q8mTJOASx8j1Au+a5WDVnPi2lkFfwwEAa8hDDdjZlpLegxhjVME1fgjWPGmkzs7" crossorigin="anonymous">
+  <style>
+    .chart {
+      width: 1000px;
+      height: 500px;
+    }
+    #floatingRectangle {
+      top: 0;
+      position: fixed;
+      right: 0;
+    }
+  </style>
+</head>
+<body>
+
+
+<div class="col-md-12" ng-controller="C2VSim">
+
+  <div class="col-md-6 panel" id="floatingRectangle">
+    <form role="form" ng-submit="startSimulation()">
+      <!-- general form elements disabled -->
+      <div class="panel panel-danger">
+        <div class="panel-heading">
+          <h3 class="panel-title"><span><i class="fa fa-file-text"></i></span> C2V Simulation Model</h3>
+        </div><!-- /.panel-heading -->
+        <div class="panel-body">
+          <!-- text input -->
+          <div class="form-group">
+            <label>Handover Distance (10~1000)</label>
+            <div></div>
+            <!--<button ng-click="addHD(10)">+10</button>-->
+            <!--<button ng-click="addHD(-10)">-10</button>-->
+            <input step="10" type="number" class="form-control" ng-model="sim_env.handoverDistance" placeholder="handoverDistance"/>
+          </div>
+          <div class="form-group">
+            <label>Start Position (0~handoverDistance/2)</label>
+            <!--<button ng-click="addPos(10)">+10</button>-->
+            <!--<button ng-click="addPos(-10)">-10</button>-->
+            <input step="10" type="number" class="form-control" ng-model="sim_env.posX" placeholder="posX"/>
+          </div>
+          <div class="form-group">
+            <label>App Parallelism [voiceCommand, voiceQuery, vision240p, visionFHD]</label>
+            <div>
+              <div class="col-md-3"><input type="number" class="form-control" ng-model="sim_env.apps.voiceCommand.parallel" placeholder=""/></div>
+              <div class="col-md-3"><input type="number" class="form-control" ng-model="sim_env.apps.voiceQuery.parallel" placeholder=""/></div>
+              <div class="col-md-3"><input type="number" class="form-control" ng-model="sim_env.apps.vision240p.parallel" placeholder=""/></div>
+              <div class="col-md-3"><input type="number" class="form-control" ng-model="sim_env.apps.visionFHD.parallel" placeholder=""/></div>
+            </div>
+          </div>
+          <div class="form-group">
+            <label># of Frame(Vision App)</label>
+            <!--<button ng-click="addFrame(10)">+10</button>-->
+            <!--<button ng-click="addFrame(-10)">-10</button>-->
+            <input step="10" type="number" class="form-control" ng-model="numberOfFrame" placeholder="numberOfFrame"/>
+          </div>
+          <div class="form-group">
+            <label>Vehicle Core Utilization</label>
+            <div>
+              <div ng-repeat="core in sim_env.resources.vehicle.core track by $index" class="col-md-6"><input step="0.1" type="number" class="form-control" ng-model="core" placeholder=""/></div>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label>Cloud Type 0 Utilization</label>
+            <div>
+              <div class="col-md-3"><input step="0.1" type="number" class="form-control" ng-model="sim_env.resources.cloud[0].core[0]" placeholder=""/></div>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label>Cloud Type 1 Utilization</label>
+            <div>
+              <div ng-repeat="core in sim_env.resources.cloud[1].core" class="col-md-3"><input step="0.1" type="number" class="form-control" ng-model="core" placeholder=""/></div>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label>Cloud Type 2 Utilization</label>
+            <div>
+              <div ng-repeat="a in sim_env.resources.cloud[2].core" class="col-md-3"><input step="0.1" type="number" class="form-control" ng-model="a" placeholder=""/></div>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label>Number of users on cells for offloading (uplink, downlink)</label>
+            <div>
+              <div ng-repeat="cell in sim_env.cells track by $index" class="col-md-1" style="border:2px solid black;"><input type="number" class="form-control" ng-model="cell[0]" placeholder=""/><input type="number" class="form-control" ng-model="cell[1]" placeholder=""/></div>
+              <button ng-click="addCell(1)">+</button>
+              <button ng-click="addCell(0)">-</button>
+            </div>
+          </div>
+          <div class="form-group">
+            <label>Number of users on cells real status (uplink, downlink)</label>
+            <div>
+              <div ng-repeat="cell in sim_env.realcells track by $index" class="col-md-1" style="border:2px solid black;"><input type="number" class="form-control" ng-model="cell[0]" placeholder=""/><input type="number" class="form-control" ng-model="cell[1]" placeholder=""/></div>
+              <button ng-click="addRealCell(1)">+</button>
+              <button ng-click="addRealCell(0)">-</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </form>
+  </div>
+  <div class="col-md-6 panel">
+    <div class="panel panel-danger">
+      <div class="panel-heading">
+        <h3 class="panel-title"><span><i class="fa fa-file-text"></i></span> C2V Simulation Result</h3>
+      </div><!-- /.panel-heading -->
+      <div class="panel-body">
+        <div><h2>{{indicator}}</h2></div>
+        <div id="voiceCommand" class="chart"></div>
+        <div id="voiceQuery" class="chart"></div>
+        <div id="vision240p" class="chart"></div>
+        <div id="visionFHD" class="chart"></div>
+        <div><textarea ng-model="result" style="width:100%;border:1;overflow:visible;text-overflow:ellipsis;" rows=15></textarea></div>
+        <div>{{ sim_env }}</div>
+      </div>
+    </div>
+  </div>
+</div>
+<script data-main="js/bootstrap2" src="lib/require.js"></script>
+</body>
+</html>

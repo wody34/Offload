@@ -212,7 +212,7 @@ function vehicleGenerator(intraVehicleModel, interVehicleModel) {
             var time = this.time();
             task = message.task;
             console.log(_.template('[Task<%= id %>] Rx return to vehicle[<%= receiver %>] at vm[<%= sender %>]')({id: task[task.cur].id, sender: this.id, receiver: sender.id}));
-            this.setTimer(DataTransferTimeMethod.simple(task[task.cur].inputSize, getNT(time))).done(this.taskStart, this, [message.task]);
+            this.setTimer(0).done(this.taskStart, this, [message.task]);
           }
         },
         taskStart: function (task) {
